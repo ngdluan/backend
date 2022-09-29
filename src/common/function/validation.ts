@@ -1,5 +1,5 @@
 import { fail } from "../const";
-import { throwError } from "./index";
+import { throwError } from "./";
 
 class V {
   fail: string[] = [];
@@ -9,12 +9,6 @@ class V {
     this.key = key + " ";
   }
 
-  isOptional() {
-    if (this.str === null || this.str === undefined) {
-      return this;
-    }
-    return this;
-  }
   regex(r: RegExp) {
     const result = r.test(this.str);
     if (!result) {
