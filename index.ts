@@ -9,7 +9,6 @@ const port = process.env.PORT || 3003;
 app.use(express.json());
 
 for (const r of routers) {
-  console.log(r.path);
   app.use(r.path, r.handler);
 }
 
