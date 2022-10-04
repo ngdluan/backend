@@ -1,24 +1,23 @@
-import { CustomError } from './../common/function/error';
+import { CustomError } from "./../common/function/error";
 import { Request, Response, NextFunction } from "express";
-import { httpCode, errorMsg } from '../common/const';
+import { httpCode, errorMsg } from "../common/const";
 
 const handler =
-  (cb: any) => (req: Request, res: Response, next: NextFunction) => {
+  (cb: any) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-      cb(req, res, next);
+      await cb(req, res, next);
     } catch (error: any) {
-      errorHandler(error, req, res)
+      errorHandler(error, req, res);
     }
   };
 
 export default handler;
-
 
 function errorHandler(error: CustomError, req: Request, res: Response) {
   res.status(error?.code ?? httpCode.INTERNAL_SERVER_ERROR).json({
     path: req.originalUrl,
     message: error.message ?? errorMsg.INTERNAL_SERVER_ERROR,
     details: error.details ?? "",
-    status: error.code ?? httpCode.INTERNAL_SERVER_ERROR
-  })
+    status: error.code ?? httpCode.INTERNAL_SERVER_ERROR,
+  });
 }

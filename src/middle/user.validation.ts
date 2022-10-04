@@ -1,12 +1,45 @@
+import { V, throwError } from "../common/function";
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { httpCode, errorMsg } from "../common/const";
 
-function userSignupRequest(req: Request, res: Response, next: NextFunction) { }
+const userMiddle = {
+  userSignUpReq: (req: Request, res: Response, next: NextFunction) => {
+    const { email, userName, password } = req.body;
+    new V(email, "Email").isString().isEmail();
+    new V(userName, "Username").isString;
+    new V(password, "Password").isString().haveNomalChar().haveUpperChar();
+    console.log(process.env.SALT_ROUND);
+    const hash = bcrypt.hashSync(password, Number(process.env.SALT_ROUND));
+    delete req.body.password;
+    req.body.hash = hash;
+    next();
+  },
+  userSignInReq: (req: Request, res: Response, next: NextFunction) => {
+    const { email, userName, password } = req.body;
+    new V(email, "Email", true).isString().isEmail();
+    new V(userName, "UserName", true).isString();
+    new V(password, "Password").isString().haveNomalChar().haveUpperChar();
+    next();
+  },
+  userAuthenReq: (req: Request, res: Response, next: NextFunction) => {
+    const authorization: string | undefined = req.headers.authorization;
+    if (!authorization)
+      return throwError(
+        errorMsg.NETWORK_AUTHENTICATION_REQUIRED,
+        httpCode.NETWORK_AUTHENTICATION_REQUIRED
+      );
+    const token = authorization.split(" ")?.[1] || authorization.split(" ")[0];
+    const payload = jwt.verify(token, process.env.JSON);
+    if (typeof payload !== "string") {
+      if (payload?.type === "Refresh") {
+        // res.status(httpCode.)
+      }
+    }
+    req.body.user = payload;
+    next();
+  },
+};
 
-async function userAuth(req: Request, res: Response, next: NextFunction) {
-  const token: string = req.headers.authorization?.split(' ')?.[1] || req.headers.authorization?.split(' ')?.[0] || '';
-  const JWT_TOKEN = process.env.JWT_TOKEN || '';
-  const user = jwt.verify(token, JWT_TOKEN);
-  req.body.user = user;
-  next();
-}
+export default userMiddle;
