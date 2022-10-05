@@ -22,3 +22,37 @@ model Detail {
   key    String?
   value  String?
 }
+
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  Tags        Tag[]
+  Attr        Attr[]
+  Price       Price?  @relation(fields: [priceId], references: [id])
+  priceId     String?
+}
+
+model Tag {
+  id       String    @id @default(uuid())
+  key      String?
+  value    String?
+  Products Product[]
+}
+
+model Attr {
+  id       String    @id @default(uuid())
+  key      String?
+  value    String?
+  Products Product[]
+  Price    Price[]
+}
+
+model Price {
+  id       String    @id @default(uuid())
+  key      String?
+  value    String?
+  Products Product[]
+  attrId   String?
+  Attr     Attr?     @relation(fields: [attrId], references: [id])
+}

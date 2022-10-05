@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
-
 import { Request, Response, NextFunction } from "express";
+
 import { throwError } from "../../common/function";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { errorMsg, httpCode, jwtType, successMsg } from "../../common/const";
@@ -12,7 +12,8 @@ const prisma = new PrismaClient();
 
 export default {
   /**
-   *Login user to server. Request user info in req.body
+   *Login user to server. Request user info
+   *{email, password} in req.body
    */
   userLogin: async (req: Request, res: Response, next: NextFunction) => {
     const { password, ...user } = req.body.user;
@@ -65,6 +66,9 @@ export default {
       },
     });
   },
+  /**
+   *
+   * */
   userAuth: (req: Request, res: Response, next: NextFunction) => {},
   userById: async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
