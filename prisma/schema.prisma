@@ -27,10 +27,10 @@ model Product {
   id          String  @id @default(uuid())
   name        String
   description String?
-  Tags        Tag[]
+  Tags        Tag?    @relation(fields: [tagId], references: [id])
   Attr        Attr[]
-  Price       Price?  @relation(fields: [priceId], references: [id])
-  priceId     String?
+  Price       Price[]
+  tagId       String?
 }
 
 model Tag {
@@ -49,10 +49,12 @@ model Attr {
 }
 
 model Price {
-  id       String    @id @default(uuid())
-  key      String?
-  value    String?
-  Products Product[]
-  attrId   String?
-  Attr     Attr?     @relation(fields: [attrId], references: [id])
+  id        String   @id @default(uuid())
+  key       String?
+  value     String?
+  sku       String?
+  Products  Product? @relation(fields: [productId], references: [id])
+  attrId    String?
+  Attr      Attr?    @relation(fields: [attrId], references: [id])
+  productId String?
 }
