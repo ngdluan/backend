@@ -37,6 +37,8 @@ model Role {
   key   String
   value Boolean
   User  User[]
+
+  @@unique([key, value])
 }
 
 model Address {
@@ -65,15 +67,15 @@ model UserDetail {
 }
 
 model Product {
-  id           String        @id @default(uuid())
-  name         String
-  Tags         Tag[]
-  ProductAttr  ProductAttr[]
-  ProductPrice ProductVar[]
-  Category     Category[]
-  iAt          DateTime      @default(now())
-  uAt          DateTime      @updatedAt
-  Vote         Vote[]
+  id          String        @id @default(uuid())
+  name        String
+  Tags        Tag[]
+  ProductAttr ProductAttr[]
+  ProductVar  ProductVar[]
+  Category    Category[]
+  iAt         DateTime      @default(now())
+  uAt         DateTime      @updatedAt
+  Vote        Vote[]
 }
 
 model Tag {
@@ -81,6 +83,8 @@ model Tag {
   key     String
   value   String
   Product Product[]
+
+  @@unique([key, value])
 }
 
 model ProductAttr {
@@ -92,6 +96,8 @@ model ProductAttr {
   ProductPrice ProductVar[]
   iAt          DateTime     @default(now())
   uAt          DateTime     @updatedAt
+
+  @@unique([key, value])
 }
 
 model ProductVar {
@@ -112,7 +118,8 @@ model ProductVar {
 
 model Category {
   id      String    @id @default(uuid())
-  name    String
+  name    String    @unique
+  details Json
   Product Product[]
   iAt     DateTime  @default(now())
   uAt     DateTime  @updatedAt
@@ -147,7 +154,7 @@ model ProductMove {
   productVarId String?
   Order        Order?      @relation(fields: [orderId], references: [id])
   orderId      String?
-  quantity     Int
+  quantity     Int         @default(0)
   couponId     String?
   Cart         Cart?       @relation(fields: [cartId], references: [id])
   cartId       String?
@@ -164,8 +171,8 @@ model Coupon {
   code         String
   discountType String
   value        String
-  maxValue     Int
-  minValue     Int
+  maxValue     Int?
+  minValue     Int?
   quantity     Int?
   User         User[]
   active       Boolean?
