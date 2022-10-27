@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./data.db"
 }
 
 model User {
@@ -30,6 +30,7 @@ model User {
   Coupon   Coupon?      @relation(fields: [couponId], references: [id])
   couponId String?
   Role     Role[]
+  Comment  Comment[]
 }
 
 model Role {
@@ -52,6 +53,7 @@ model Address {
   User    User?    @relation(fields: [userId], references: [id])
   userId  String?
   Order   Order[]
+  main    Boolean?
   iAt     DateTime @default(now())
   uAt     DateTime @updatedAt
 }
@@ -67,15 +69,23 @@ model UserDetail {
 }
 
 model Product {
-  id          String        @id @default(uuid())
-  name        String
-  Tags        Tag[]
-  ProductAttr ProductAttr[]
-  ProductVar  ProductVar[]
-  Category    Category[]
-  iAt         DateTime      @default(now())
-  uAt         DateTime      @updatedAt
-  Vote        Vote[]
+  id           String        @id @default(uuid())
+  name         String
+  Tags         Tag[]
+  ProductAttr  ProductAttr[]
+  ProductPrice ProductVar[]
+  Category     Category[]
+  iAt          DateTime      @default(now())
+  uAt          DateTime      @updatedAt
+  Comment      Comment[]
+  Image        Image[]
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  link      String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
 }
 
 model Tag {
@@ -105,6 +115,7 @@ model ProductVar {
   price       Int?
   public      Boolean?      @default(false)
   sku         String        @unique
+  kiotId      String        @unique
   quantity    Int
   Product     Product       @relation(fields: [productId], references: [id])
   productId   String
@@ -119,20 +130,22 @@ model ProductVar {
 model Category {
   id      String    @id @default(uuid())
   name    String    @unique
-  details Json
+  details String
   Product Product[]
   iAt     DateTime  @default(now())
   uAt     DateTime  @updatedAt
 }
 
-model Vote {
+model Comment {
   id        String   @id @default(uuid())
-  star      Int
-  comment   String
-  Product   Product  @relation(fields: [productId], references: [id])
-  productId String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+  content   String?
   iAt       DateTime @default(now())
   uAt       DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  star      Int?
 }
 
 model Order {
