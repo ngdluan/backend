@@ -69,16 +69,16 @@ model UserDetail {
 }
 
 model Product {
-  id           String        @id @default(uuid())
-  name         String
-  Tags         Tag[]
-  ProductAttr  ProductAttr[]
-  ProductPrice ProductVar[]
-  Category     Category[]
-  iAt          DateTime      @default(now())
-  uAt          DateTime      @updatedAt
-  Comment      Comment[]
-  Image        Image[]
+  id          String        @id @default(uuid())
+  name        String
+  Tags        Tag[]
+  ProductAttr ProductAttr[]
+  ProductVar  ProductVar[]
+  Category    Category[]
+  iAt         DateTime      @default(now())
+  uAt         DateTime      @updatedAt
+  Comment     Comment[]
+  Image       Image[]
 }
 
 model Image {
@@ -101,8 +101,7 @@ model ProductAttr {
   id           String       @id @default(uuid())
   key          String
   value        String
-  Product      Product?     @relation(fields: [productId], references: [id])
-  productId    String?
+  Product      Product[]
   ProductPrice ProductVar[]
   iAt          DateTime     @default(now())
   uAt          DateTime     @updatedAt
@@ -114,9 +113,9 @@ model ProductVar {
   id          String        @id @default(uuid())
   price       Int?
   public      Boolean?      @default(false)
-  sku         String        @unique
-  kiotId      String        @unique
-  quantity    Int
+  sku         String?       @unique
+  kiotId      String?       @unique
+  quantity    Int?
   Product     Product       @relation(fields: [productId], references: [id])
   productId   String
   ProductAttr ProductAttr[]
