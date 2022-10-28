@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('product')
 @ApiTags('Product Router')
@@ -16,8 +16,29 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  @ApiQuery({
+    name: "search",
+    type: String,
+    description: "search. Optional",
+    required: false
+  })
+  @ApiQuery({
+    name: "skip",
+    type: String,
+    description: "search. Optional",
+    required: false
+  })
+  @ApiQuery({
+    name: "take",
+    type: String,
+    description: "search. Optional",
+    required: false
+  })
+  findAll(@Query('search') searchQuery?: string,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string
+  ) {
+    return this.productService.findAll(searchQuery, +skip, +take);
   }
 
   @Get(':id')

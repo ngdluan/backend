@@ -6,6 +6,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { v4 } from 'uuid'
 import { Prisma } from "@prisma/client"
 import { validateHeaderValue } from 'http';
+import { info } from 'console';
 
 @Injectable()
 export class ProductService {
@@ -79,7 +80,20 @@ export class ProductService {
     return { message: "Product successfully created" };
   }
 
-  async findAll(where?: Prisma.ProductWhereInput, skip?: number, take?: number) {
+  async findAll(search?: string, skip?: number, take?: number) {
+    let where = { OR: [] }
+    if (search) {
+      ['name', 'Tags.value', 'ProductAttr.value', 'ProductVar.sku', 'Category.name'].map(e => {
+        if (e.includes('.')) {
+          const keys = e.split('.')
+          where.OR.push({ [keys[0]]: { some: { [keys[1]]: { contains: search } } } })
+        } else {
+          where.OR.push({ [e]: { contains: search } })
+        }
+      })
+    } else {
+      where = undefined
+    }
     const [result, count] = await this.prisma.$transaction([this.prisma.product.findMany({
       where, select: {
         name: true,
@@ -94,7 +108,7 @@ export class ProductService {
             ProductAttr: { select: { key: true, value: true } }
           }
         },
-      }, skip, take
+      }, skip: Number(skip || 0), take: Number(take || 50)
     }), this.prisma.product.count({ where })]);
     return { count, result }
   }
